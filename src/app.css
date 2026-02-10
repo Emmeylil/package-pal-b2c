@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --color-jumia-orange: #F68B1E;
+  --color-jumia-dark: #282828;
+  --font-roboto: "Roboto", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply font-roboto bg-gray-50 text-gray-800;
+  }
+}
+
+.jumia-orange {
+  color: var(--color-jumia-orange);
+}
+
+.bg-jumia-orange {
+  background-color: var(--color-jumia-orange);
+}
+
+.jumia-black {
+  color: var(--color-jumia-dark);
+}
+
+.bg-jumia-dark {
+  background-color: var(--color-jumia-dark);
+}
