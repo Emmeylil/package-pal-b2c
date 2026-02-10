@@ -81,37 +81,65 @@
     const CSV_URL =
         "https://docs.google.com/spreadsheets/d/19_ER7XMk2DSo_iTFL7RY1Hk_KRwkbuMEh6AEd5TypqM/export?format=csv&gid=0";
 
+    /** @param {string} text */
     function parseCSV(text) {
-        const lines = text.split(/\r?\n/).filter((line) => line.trim());
         const result = [];
-        for (let i = 1; i < lines.length; i++) {
-            const line = lines[i];
-            const vals = [];
-            let curr = "",
-                inQ = false;
-            for (let j = 0; j < line.length; j++) {
-                if (line[j] === '"') inQ = !inQ;
-                else if (line[j] === "," && !inQ) {
-                    vals.push(curr.trim());
-                    curr = "";
-                } else curr += line[j];
+        const rows = [];
+        let currRow = [];
+        let currField = "";
+        let inQuotes = false;
+
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            const nextChar = text[i + 1];
+
+            if (char === '"' && inQuotes && nextChar === '"') {
+                currField += '"';
+                i++; // Skip next quote
+            } else if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === "," && !inQuotes) {
+                currRow.push(currField.trim());
+                currField = "";
+            } else if ((char === "\r" || char === "\n") && !inQuotes) {
+                if (currField || currRow.length > 0) {
+                    currRow.push(currField.trim());
+                    rows.push(currRow);
+                    currRow = [];
+                    currField = "";
+                }
+                if (char === "\r" && nextChar === "\n") i++; // Handle CRLF
+            } else {
+                currField += char;
             }
-            vals.push(curr.trim());
-            if (vals[0]) {
+        }
+
+        // Add final field/row if not empty
+        if (currField || currRow.length > 0) {
+            currRow.push(currField.trim());
+            rows.push(currRow);
+        }
+
+        // Process rows (skip header)
+        for (let i = 1; i < rows.length; i++) {
+            const vals = rows[i];
+            // Ensure we have enough columns and the first column (name) isn't empty
+            if (vals.length >= 10 && vals[0]) {
                 result.push({
-                    name: vals[0].replace(/^"/, "").replace(/"$/, "").trim(),
+                    name: vals[0],
                     week: vals[1],
                     weekend: vals[2],
                     phone: vals[3],
-                    address: vals[4].replace(/^"/, "").replace(/"$/, "").trim(),
+                    address: vals[4],
                     state: vals[5],
-                    landmark: vals[7],
-                    map: vals[8],
-                    lat: parseFloat(vals[9]),
-                    lng: parseFloat(vals[10]),
+                    landmark: vals[7] || "",
+                    map: vals[8] || "",
+                    lat: parseFloat(vals[9]) || 0,
+                    lng: parseFloat(vals[10]) || 0,
                 });
             }
         }
+        console.log(`Parsed ${result.length} stations from CSV`);
         return result;
     }
 
@@ -136,12 +164,12 @@
 
     async function initMap() {
         if (!browser || !mapElement || stations.length === 0) return;
-        if (typeof window.L === "undefined") {
+        if (typeof (/** @type {any} */ (window).L) === "undefined") {
             setTimeout(initMap, 200);
             return;
         }
         if (map) return;
-        const L = window.L;
+        const L = /** @type {any} */ (window).L;
         const DefaultIcon = L.icon({
             iconUrl:
                 "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -187,6 +215,7 @@
         if (!loading && browser) initMap();
     });
 
+    /** @param {any} s */
     function selectStation(s) {
         selectedStation = s;
         if (map && s.lat) {
