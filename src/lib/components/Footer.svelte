@@ -1,11 +1,13 @@
 <footer class="bg-gray-900 text-gray-400 py-12">
     <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-            <h3
-                class="text-white font-bold mb-4 uppercase text-sm tracking-wider"
-            >
-                About Jumia Delivery
-            </h3>
+            <div class="mb-4">
+                <img
+                    src="/images/jumia-delivery-logo.jpg"
+                    alt="Jumia Delivery"
+                    class="h-10 w-auto rounded"
+                />
+            </div>
             <p class="text-sm leading-relaxed">
                 Helping businesses grow through reliable logistics
                 infrastructure across Africa.
