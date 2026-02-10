@@ -13,9 +13,10 @@
             </div>
             <div class="hidden md:flex space-x-8">
                 <a
-                    href="/"
+                    href="https://www.jumia.com.ng/sp-jumia-delivery/"
                     class="text-gray-500 hover:text-jumia-orange transition"
-                    >Personal (C2C)</a
+                    target="_blank"
+                    rel="noopener noreferrer">Personal (C2C)</a
                 >
                 <a
                     href="/"
