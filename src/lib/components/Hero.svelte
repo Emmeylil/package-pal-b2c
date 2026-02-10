@@ -7,8 +7,16 @@
         name: "",
         email: "",
         phone: "",
-        station: "",
+        estimate: "",
     });
+
+    const VOLUME_ESTIMATES = [
+        "1 - 50 packages",
+        "51 - 200 packages",
+        "201 - 500 packages",
+        "501 - 1000 packages",
+        "1001+ packages",
+    ];
 
     /** @type {string[]} */
     let stations = $state([]);
@@ -62,7 +70,7 @@
                 "Business Name": snapshot.name,
                 "Email Address": snapshot.email,
                 "Phone Number": snapshot.phone,
-                "Pickup Station": snapshot.station,
+                "Monthly Estimate": snapshot.estimate,
                 SubmittedAt: new Date().toISOString(),
             };
 
@@ -93,7 +101,7 @@
             formData.name = "";
             formData.email = "";
             formData.phone = "";
-            formData.station = "";
+            formData.estimate = "";
         } catch (err) {
             console.error("Error during submission: ", err);
             const errMsg =
@@ -294,21 +302,21 @@
                                     />
                                 </div>
                                 <div>
-                                    <label for="station" class="sr-only"
-                                        >Preferred Pickup Station</label
+                                    <label for="estimate" class="sr-only"
+                                        >Monthly Package Estimate</label
                                     >
                                     <select
-                                        id="station"
-                                        bind:value={formData.station}
+                                        id="estimate"
+                                        bind:value={formData.estimate}
                                         required
                                         class="block w-full px-4 py-3 border border-gray-300 rounded-md text-gray-500 focus:outline-none focus:ring-2 focus:ring-jumia-orange focus:border-transparent"
                                     >
                                         <option value="" disabled selected
-                                            >Select Preferred Pickup Station</option
+                                            >Monthly Package Estimate</option
                                         >
-                                        {#each stations as station}
-                                            <option value={station}
-                                                >{station}</option
+                                        {#each VOLUME_ESTIMATES as volume}
+                                            <option value={volume}
+                                                >{volume}</option
                                             >
                                         {/each}
                                     </select>
