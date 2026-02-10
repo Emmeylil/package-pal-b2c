@@ -5,7 +5,6 @@
     import Integration from "$lib/components/Integration.svelte";
     import PickupStations from "$lib/components/PickupStations.svelte";
     import Stats from "$lib/components/Stats.svelte";
-    import Footer from "$lib/components/Footer.svelte";
 </script>
 
 <Navbar />
@@ -15,4 +14,3 @@
     <PickupStations />
     <Stats />
 </main>
-<Footer />
