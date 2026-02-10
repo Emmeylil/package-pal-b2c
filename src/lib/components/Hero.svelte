@@ -11,11 +11,10 @@
     });
 
     const VOLUME_ESTIMATES = [
-        "1 - 50 packages",
+        "0 - 50 packages",
         "51 - 200 packages",
-        "201 - 500 packages",
-        "501 - 1000 packages",
-        "1001+ packages",
+        "201 - 1,000 packages",
+        "1,000+ packages",
     ];
 
     /** @type {string[]} */
@@ -303,7 +302,7 @@
                                 </div>
                                 <div>
                                     <label for="estimate" class="sr-only"
-                                        >Monthly Package Estimate</label
+                                        >Monthly Packages (Estimate)</label
                                     >
                                     <select
                                         id="estimate"
@@ -312,7 +311,7 @@
                                         class="block w-full px-4 py-3 border border-gray-300 rounded-md text-gray-500 focus:outline-none focus:ring-2 focus:ring-jumia-orange focus:border-transparent"
                                     >
                                         <option value="" disabled selected
-                                            >Monthly Package Estimate</option
+                                            >Monthly Packages (Estimate)</option
                                         >
                                         {#each VOLUME_ESTIMATES as volume}
                                             <option value={volume}
