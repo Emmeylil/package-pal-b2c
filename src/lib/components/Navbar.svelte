@@ -28,9 +28,9 @@
                     >Features</a
                 >
                 <a
-                    href="#integration"
+                    href="#pickup-stations"
                     class="text-gray-500 hover:text-jumia-orange transition"
-                    >API & Integration</a
+                    >Pickup Point</a
                 >
             </div>
             <div class="flex items-center gap-4">
