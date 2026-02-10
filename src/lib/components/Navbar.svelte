@@ -34,11 +34,6 @@
                 >
             </div>
             <div class="flex items-center gap-4">
-                <a
-                    href="/"
-                    class="text-sm font-medium text-gray-600 hover:text-jumia-orange"
-                    >Login</a
-                >
                 <button
                     class="bg-jumia-orange text-white px-5 py-2 rounded shadow hover:bg-orange-600 transition font-bold"
                 >
