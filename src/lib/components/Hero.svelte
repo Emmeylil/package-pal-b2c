@@ -1,7 +1,5 @@
 <script>
     import { onMount } from "svelte";
-    import { db } from "$lib/firebase";
-    import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
     let formData = $state({
         name: "",
@@ -26,28 +24,11 @@
 
     onMount(async () => {
         try {
-            const res = await fetch(
-                "https://docs.google.com/spreadsheets/d/19_ER7XMk2DSo_iTFL7RY1Hk_KRwkbuMEh6AEd5TypqM/export?format=csv&gid=0",
-            );
-            const text = await res.text();
-            const lines = text.split(/\r?\n/).filter((line) => line.trim());
-            stations = lines
-                .slice(1)
-                .map((line) => {
-                    let current = "";
-                    let inQuotes = false;
-                    const vals = [];
-                    for (let i = 0; i < line.length; i++) {
-                        if (line[i] === '"') inQuotes = !inQuotes;
-                        else if (line[i] === "," && !inQuotes) {
-                            vals.push(current.trim());
-                            current = "";
-                        } else current += line[i];
-                    }
-                    vals.push(current.trim());
-                    return vals[0].replace(/^"/, "").replace(/"$/, "").trim();
-                })
-                .filter(Boolean);
+            // Updated to use the internal API
+            const res = await fetch("/api/stations");
+            if (!res.ok) throw new Error("Failed to fetch stations");
+            const data = await res.json();
+            stations = data.map((s) => s.name);
         } catch (e) {
             console.error("Failed to fetch stations for Hero:", e);
         }
@@ -57,43 +38,29 @@
     async function handleSubmit(event) {
         if (event) event.preventDefault();
 
-        console.log("Starting submission...");
+        console.log("Starting submission via backend...");
         const snapshot = $state.snapshot(formData);
 
         loading = true;
         error = null;
 
         try {
-            // 1. Prepare data
-            const dataToSave = {
-                "Business Name": snapshot.name,
-                "Email Address": snapshot.email,
-                "Phone Number": snapshot.phone,
-                "Monthly Estimate": snapshot.estimate,
-                SubmittedAt: new Date().toISOString(),
-            };
-
-            // 2. Save to Firestore
-            console.log("Saving to Firestore:", dataToSave);
-            await addDoc(collection(db, "business_leads"), {
-                ...dataToSave,
-                SubmittedAt: serverTimestamp(), // Use Firestore's server timestamp
-            });
-
-            // 3. Save to Google Sheets
-            console.log("Syncing to Google Sheets...");
-            const SHEETS_URL =
-                "https://script.google.com/macros/s/AKfycbySb7Kzbzq9BapO8z-PizM3Ahjy4Ly4NcsrHvOKruRLAoTvRpvacpV8JzoSkhiWaUtL/exec";
-
-            await fetch(SHEETS_URL, {
+            // Call the new backend API instead of direct Firestore/Sheets
+            const response = await fetch("/api/leads", {
                 method: "POST",
-                mode: "no-cors",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(dataToSave),
+                body: JSON.stringify(snapshot),
             });
 
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || "Submission failed");
+            }
+
+            console.log("Submission successful:", result);
             alert("Success! Your business account request has been received.");
 
             submitted = true;
