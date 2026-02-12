@@ -1,7 +1,31 @@
 <script>
+    import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
+    import { auth } from "$lib/firebase";
+    import { signOut } from "firebase/auth";
+    import { user, authLoading } from "$lib/authStore";
+
     /** @type {any} */
     export let data;
     const { leads, error } = data;
+
+    onMount(() => {
+        const unsubscribe = user.subscribe((u) => {
+            if (!$authLoading && !u) {
+                goto("/admin/login");
+            }
+        });
+        return unsubscribe;
+    });
+
+    async function handleLogout() {
+        try {
+            await signOut(auth);
+            goto("/admin/login");
+        } catch (err) {
+            console.error("Logout error:", err);
+        }
+    }
 
     /**
      * @param {string | null | undefined} dateStr
@@ -44,13 +68,19 @@
                         >
                     </p>
                 </div>
-                <div class="mt-4 flex md:mt-0 md:ml-4">
+                <div class="mt-4 flex space-x-3 md:mt-0 md:ml-4">
                     <a
                         href="/"
                         class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-jumia-orange transition-all"
                     >
-                        Back to Site
+                        View Site
                     </a>
+                    <button
+                        on:click={handleLogout}
+                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-jumia-dark hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-jumia-dark transition-all"
+                    >
+                        Logout
+                    </button>
                 </div>
             </div>
         </div>
