@@ -28,7 +28,7 @@
             const res = await fetch("/api/stations");
             if (!res.ok) throw new Error("Failed to fetch stations");
             const data = await res.json();
-            stations = data.map((s) => s.name);
+            stations = data.map((/** @type {any} */ s) => s.name);
         } catch (e) {
             console.error("Failed to fetch stations for Hero:", e);
         }

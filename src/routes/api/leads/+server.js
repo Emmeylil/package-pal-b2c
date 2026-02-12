@@ -52,7 +52,8 @@ export async function POST({ request }) {
         return json({ success: true, id: docRef.id });
 
     } catch (err) {
-        console.error("Backend API Error:", err);
-        return json({ error: err.message || 'Internal Server Error' }, { status: 500 });
+        const error = /** @type {Error} */ (err);
+        console.error("Backend API Error:", error);
+        return json({ error: error.message || 'Internal Server Error' }, { status: 500 });
     }
 }

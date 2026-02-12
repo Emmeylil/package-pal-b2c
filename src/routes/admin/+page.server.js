@@ -9,11 +9,28 @@ export async function load() {
 
         const leads = querySnapshot.docs.map(doc => {
             const data = doc.data();
+            // Create a clean serializable object
+            /** @type {Record<string, any>} */
+            const cleanData = {};
+            for (const key in data) {
+                const val = data[key];
+                if (key === 'SubmittedAt' && val?.toDate) {
+                    cleanData[key] = val.toDate().toISOString();
+                } else if (val && typeof val === 'object' && val.toDate) {
+                    // Handle other potential timestamps
+                    cleanData[key] = val.toDate().toISOString();
+                } else if (typeof val === 'function') {
+                    // Skip functions just in case
+                    continue;
+                } else {
+                    cleanData[key] = val;
+                }
+            }
+
             return {
                 id: doc.id,
-                ...data,
-                // Ensure SubmittedAt is serializable (Firestore timestamps are objects)
-                SubmittedAt: data.SubmittedAt?.toDate?.()?.toISOString() || data.SubmittedAt || null
+                ...cleanData,
+                SubmittedAt: cleanData.SubmittedAt || data.SubmittedAt || null
             };
         });
 
