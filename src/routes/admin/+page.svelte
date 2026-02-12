@@ -206,34 +206,55 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <label
-                                        class="flex items-center space-x-2 cursor-pointer"
+                                    <div
+                                        class="relative inline-block text-left"
                                     >
-                                        <input
-                                            type="checkbox"
-                                            checked={lead.contacted || false}
+                                        <select
+                                            value={lead.contacted
+                                                ? "contacted"
+                                                : "pending"}
                                             on:change={(e) => {
                                                 const target =
-                                                    /** @type {HTMLInputElement} */ (
+                                                    /** @type {HTMLSelectElement} */ (
                                                         e.target
                                                     );
                                                 toggleContacted(
                                                     lead.id,
-                                                    target.checked,
+                                                    target.value ===
+                                                        "contacted",
                                                 );
                                             }}
-                                            class="h-4 w-4 text-jumia-orange border-gray-300 rounded focus:ring-jumia-orange transition-all"
-                                        />
-                                        <span
-                                            class="text-xs {lead.contacted
-                                                ? 'text-green-600 font-medium'
-                                                : 'text-gray-400'}"
+                                            class="block w-full pl-3 pr-8 py-1 text-xs font-semibold rounded-full border focus:outline-none focus:ring-1 focus:ring-jumia-orange transition-all cursor-pointer appearance-none
+                                                {lead.contacted
+                                                ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
+                                                : 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200'}"
                                         >
-                                            {lead.contacted
-                                                ? "Contacted"
-                                                : "Pending"}
-                                        </span>
-                                    </label>
+                                            <option value="pending"
+                                                >Pending</option
+                                            >
+                                            <option value="contacted"
+                                                >Contacted</option
+                                            >
+                                        </select>
+                                        <!-- Custom Chevron for cleaner look -->
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400"
+                                        >
+                                            <svg
+                                                class="h-3 w-3"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="3"
+                                                    d="M19 9l-7 7-7-7"
+                                                ></path>
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-gray-500"
