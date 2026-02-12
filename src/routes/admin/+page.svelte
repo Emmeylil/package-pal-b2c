@@ -28,6 +28,35 @@
     }
 
     /**
+     * @param {string} id
+     * @param {boolean} contacted
+     */
+    async function toggleContacted(id, contacted) {
+        // Optimistic update
+        /** @type {any[]} */
+        const leadsData = leads;
+        const leadIndex = leadsData.findIndex((l) => l.id === id);
+        if (leadIndex !== -1) {
+            leadsData[leadIndex].contacted = contacted;
+        }
+
+        try {
+            const response = await fetch("/admin/api/toggle-contacted", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id, contacted }),
+            });
+            if (!response.ok) throw new Error("Failed to update");
+        } catch (err) {
+            console.error("Error toggling contacted:", err);
+            // Revert on error
+            if (leadIndex !== -1) {
+                leadsData[leadIndex].contacted = !contacted;
+            }
+        }
+    }
+
+    /**
      * @param {string | null | undefined} dateStr
      */
     function formatDate(dateStr) {
@@ -139,6 +168,12 @@
                                 scope="col"
                                 class="px-6 py-4 text-left font-semibold text-gray-900 uppercase tracking-wider"
                             >
+                                Status
+                            </th>
+                            <th
+                                scope="col"
+                                class="px-6 py-4 text-left font-semibold text-gray-900 uppercase tracking-wider"
+                            >
                                 Submitted At
                             </th>
                         </tr>
@@ -169,6 +204,36 @@
                                         {lead["Monthly Estimate"] ||
                                             "Not provided"}
                                     </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <label
+                                        class="flex items-center space-x-2 cursor-pointer"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={lead.contacted || false}
+                                            on:change={(e) => {
+                                                const target =
+                                                    /** @type {HTMLInputElement} */ (
+                                                        e.target
+                                                    );
+                                                toggleContacted(
+                                                    lead.id,
+                                                    target.checked,
+                                                );
+                                            }}
+                                            class="h-4 w-4 text-jumia-orange border-gray-300 rounded focus:ring-jumia-orange transition-all"
+                                        />
+                                        <span
+                                            class="text-xs {lead.contacted
+                                                ? 'text-green-600 font-medium'
+                                                : 'text-gray-400'}"
+                                        >
+                                            {lead.contacted
+                                                ? "Contacted"
+                                                : "Pending"}
+                                        </span>
+                                    </label>
                                 </td>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-gray-500"

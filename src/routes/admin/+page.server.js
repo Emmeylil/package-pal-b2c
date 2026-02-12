@@ -1,11 +1,11 @@
 import { db } from '$lib/firebase';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, getDocs } from 'firebase/firestore';
 
 export async function load() {
     try {
         const leadsRef = collection(db, "business_leads");
-        const q = query(leadsRef, orderBy("SubmittedAt", "desc"));
-        const querySnapshot = await getDocs(q);
+        // Remove orderBy from query to include documents missing the field
+        const querySnapshot = await getDocs(leadsRef);
 
         const leads = querySnapshot.docs.map(doc => {
             const data = doc.data();
@@ -15,6 +15,13 @@ export async function load() {
                 // Ensure SubmittedAt is serializable (Firestore timestamps are objects)
                 SubmittedAt: data.SubmittedAt?.toDate?.()?.toISOString() || data.SubmittedAt || null
             };
+        });
+
+        // Sort in memory instead (newest first)
+        leads.sort((a, b) => {
+            const dateA = a.SubmittedAt ? new Date(a.SubmittedAt).getTime() : 0;
+            const dateB = b.SubmittedAt ? new Date(b.SubmittedAt).getTime() : 0;
+            return dateB - dateA;
         });
 
         return {
